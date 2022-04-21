@@ -9,7 +9,7 @@
 ## Operation
 The executable receives three arguments.
 1. Starting time including a timezone.
-2. Ending time includind a timezone.
+2. Ending time including a timezone.
 3. A list of files.
 
 ```bash
