@@ -34,8 +34,8 @@ type Table = HashMap<String, u32>;
 pub async fn main() {
     let args = Args::parse();
 
-    let start_unix = DateTime::parse_from_str(&args.start, "%Y-%m-%d %H:%M:%S %z").unwrap().timestamp() as f64;
-    let end_unix = DateTime::parse_from_str(&args.end, "%Y-%m-%d %H:%M:%S %z").unwrap().timestamp() as f64;
+    let start_unix: f64 = str_to_unix(&args.start).await;
+    let end_unix: f64 = str_to_unix(&args.end).await;
 
     // Read the files.
     let mut tasks = Vec::new();
@@ -121,4 +121,11 @@ pub async fn eligible(log: Vec<&str>, start: f64, end: f64) -> Option< (String, 
     } else {
         None
     }
+}
+
+
+pub async fn str_to_unix(time: &str) -> f64 {
+    DateTime::parse_from_str(&time, "%Y-%m-%d %H:%M:%S %z")
+        .unwrap()
+        .timestamp() as f64
 }
