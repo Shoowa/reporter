@@ -27,6 +27,8 @@ struct Args {
     files: Vec<String>
 }
 
+type Table = HashMap<String, u32>;
+
 
 #[tokio::main]
 pub async fn main() {
@@ -38,7 +40,7 @@ pub async fn main() {
     // Read the files.
     let mut tasks = Vec::new();
     for f in args.files {
-        let handle: task::JoinHandle< Option<HashMap<String, u32>> > = task::spawn(async move {
+        let handle: task::JoinHandle<Option<Table>> = task::spawn(async move {
             if let Ok(ff) = readAsync(f).await {
                 let lines = ff.lines();
                 let score = parse_bytes(lines, start_unix, end_unix).await.unwrap();
@@ -52,7 +54,7 @@ pub async fn main() {
     }
 
     // Linearly combine the results of all the HashMaps.
-    let mut tally: HashMap<String, u32> = HashMap::new();
+    let mut tally: Table  = HashMap::new();
     for handle in tasks {
         if let Ok(result) = handle.await {
             match result {
@@ -78,9 +80,9 @@ pub async fn main() {
 
 
 /// Reads from a buffer line-by-line.
-pub async fn parse_bytes(mut buffer: Lines<&[u8]>, start: f64, end: f64) -> Result<HashMap<String, u32>, ioError> {
+pub async fn parse_bytes(mut buffer: Lines<&[u8]>, start: f64, end: f64) -> Result<Table, ioError> {
     let mut amount: u32 = 0;
-    let mut tally: HashMap<String, u32> = HashMap::new();
+    let mut tally: Table = HashMap::new();
 
     while let Some(log) = buffer.next_line().await.unwrap() {
         let segments: Vec<&str> = log.split("|").collect();
